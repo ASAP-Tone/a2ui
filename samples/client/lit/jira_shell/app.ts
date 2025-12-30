@@ -93,13 +93,15 @@ export class A2UILayoutEditor extends SignalWatcher(LitElement) {
         width: 400px;
         display: flex;
         flex-direction: column;
-        border-right: 1px solid var(--n-80);
-        background: light-dark(var(--n-98), var(--n-5));
+        border-left: 1px solid var(--n-90);
+        background: light-dark(var(--n-99), var(--n-10));
         overflow-y: auto;
-        padding: var(--bb-grid-size-3);
+        padding: 24px;
         box-sizing: border-box;
         flex-shrink: 0;
         position: relative;
+        box-shadow: -4px 0 24px rgba(0,0,0,0.02);
+        z-index: 10;
       }
 
       main {
@@ -109,7 +111,8 @@ export class A2UILayoutEditor extends SignalWatcher(LitElement) {
         overflow-y: auto;
         background: var(--background);
         position: relative;
-        padding: var(--bb-grid-size-3);
+        padding: 32px;
+        gap: 24px;
       }
 
       #hero-img {
@@ -117,38 +120,46 @@ export class A2UILayoutEditor extends SignalWatcher(LitElement) {
         max-width: 100%;
         aspect-ratio: 1280/720;
         height: auto;
-        margin-bottom: var(--bb-grid-size-6);
+        margin-bottom: 24px;
         display: block;
         margin: 0 auto;
         background: var(--background-image-light) center center / contain
           no-repeat;
+        border-radius: 16px;
       }
 
       #surfaces {
         width: 100%;
-        max-width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
         animation: fadeIn 1s cubic-bezier(0, 0, 0.3, 1) 0.3s backwards;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
       }
 
       form {
         display: flex;
         flex-direction: column;
         flex: 1;
-        gap: 16px;
+        gap: 20px;
         align-items: center;
         padding: 16px 0;
         animation: fadeIn 1s cubic-bezier(0, 0, 0.3, 1) 1s backwards;
 
         & h1 {
-          color: light-dark(var(--p-40), var(--n-90));
-          font-size: 1.5rem;
+          color: light-dark(var(--n-10), var(--n-90));
+          font-size: 1.75rem;
+          font-weight: 600;
           text-align: center;
+          margin: 0;
+          letter-spacing: -0.02em;
         }
 
         & > div {
           display: flex;
           flex: 1;
-          gap: 16px;
+          gap: 12px;
           align-items: center;
           width: 100%;
           flex-direction: column;
@@ -157,11 +168,19 @@ export class A2UILayoutEditor extends SignalWatcher(LitElement) {
             display: block;
             width: 100%;
             flex: 1;
-            border-radius: 32px;
-            padding: 16px 24px;
-            border: 1px solid var(--p-60);
-            background: light-dark(var(--n-100), var(--n-10));
+            border-radius: 16px;
+            padding: 16px 20px;
+            border: 1px solid var(--n-80);
+            background: light-dark(var(--n-100), var(--n-15));
             font-size: 16px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+
+            &:focus {
+              outline: none;
+              border-color: var(--p-60);
+              box-shadow: 0 0 0 4px var(--p-90);
+            }
           }
 
           & > button {
@@ -170,15 +189,24 @@ export class A2UILayoutEditor extends SignalWatcher(LitElement) {
             background: var(--p-40);
             color: var(--n-100);
             border: none;
-            padding: 8px 16px;
-            border-radius: 32px;
-            opacity: 0.5;
+            padding: 12px 24px;
+            border-radius: 16px;
+            opacity: 0.9;
             width: 100%;
             justify-content: center;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
 
-            &:not([disabled]) {
-              cursor: pointer;
+            &:hover:not([disabled]) {
               opacity: 1;
+              transform: translateY(-1px);
+              box-shadow: 0 4px 12px rgba(81, 84, 179, 0.3);
+            }
+
+            &:disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
             }
           }
         }
@@ -333,10 +361,10 @@ export class A2UILayoutEditor extends SignalWatcher(LitElement) {
 
   render() {
     return html`
+      <main>${this.#maybeRenderData()} ${this.#maybeRenderError()}</main>
       <aside>
         ${this.#renderThemeToggle()} ${this.#maybeRenderForm()}
       </aside>
-      <main>${this.#maybeRenderData()} ${this.#maybeRenderError()}</main>
     `;
   }
 

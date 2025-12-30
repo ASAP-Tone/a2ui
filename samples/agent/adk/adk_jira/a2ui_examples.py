@@ -233,6 +233,14 @@ JIRA_UI_EXAMPLES = r"""
         {
           "id": "comment_item",
           "component": {
+            "Card": {
+              "child": "comment_content"
+            }
+          }
+        },
+        {
+          "id": "comment_content",
+          "component": {
             "Column": {
               "children": {
                 "explicitList": ["comment_author", "comment_body"]
