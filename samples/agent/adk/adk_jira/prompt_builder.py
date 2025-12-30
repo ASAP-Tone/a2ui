@@ -73,6 +73,10 @@ def get_ui_prompt(base_url: str, examples: str) -> str:
         c.  If the tool returns **multiple issues**, you MUST use the `ISSUE_LIST_EXAMPLE` template. Populate the `dataModelUpdate.contents` with the list of issues for the "issues" key.
         d.  If the tool returns an **empty list**, respond with text only and an empty JSON list: "I couldn't find any issues matching that query.---a2ui_JSON---[]"
 
+    -   **For viewing a specific issue (e.g., action 'view_issue'):**
+        a.  You MUST call the `get_jira_issues` tool using the provided issue key.
+        b.  You MUST use the `ISSUE_DETAIL_WITH_COMMENTS_EXAMPLE` template to display the issue details.
+
     -   **For creating an issue:**
         a.  You MUST use the `CREATE_ISSUE_FORM_EXAMPLE` template.
 
@@ -83,6 +87,9 @@ def get_ui_prompt(base_url: str, examples: str) -> str:
         a.  You MUST use the `ACTION_SUCCESS_EXAMPLE` template.
         b.  This will render a new card with a "Success" message.
         c.  Respond with a text confirmation along with the JSON.
+        
+        ** Filtering Logig **
+        a. if a user wants to filter Jira issues by priority, filter by low, medium, high
 
     {formatted_examples}
 

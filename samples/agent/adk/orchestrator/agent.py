@@ -15,8 +15,8 @@
 import json
 import logging
 import os
-from typing import List
-from a2a.client import A2ACardResolver
+from typing import List, Any
+from a2a.client import A2ACardResolver, Client, ClientCallContext, Consumer
 from a2a.extensions.common import HTTP_EXTENSION_HEADER
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.agents.llm_agent import LlmAgent
@@ -32,7 +32,7 @@ from google.adk.models.llm_response import LlmResponse
 from subagent_route_manager import SubagentRouteManager
 from a2ui.a2ui_extension import is_a2ui_part, A2UI_EXTENSION_URI
 from typing import override
-from a2a.types import TransportProtocol as A2ATransport
+from a2a.types import TransportProtocol as A2ATransport, AgentCard
 
 logger = logging.getLogger(__name__)
 from a2a.client.middleware import ClientCallInterceptor
@@ -183,7 +183,7 @@ class OrchestratorAgent:
 
         LITELLM_MODEL = os.getenv("LITELLM_MODEL", "gemini/gemini-2.5-flash")
         return LlmAgent(
-            model=LiteLlm(model=LITELLM_MODEL),
+            model="gemini-3-flash-preview",# LiteLlm(model=LITELLM_MODEL),
             name="orchestrator_agent",
             description="An agent that orchestrates requests to multiple other agents",
             instruction="You are an orchestrator agent. Your sole responsibility is to analyze the incoming user request, determine the user's intent, and route the task to exactly one of your expert subagents",

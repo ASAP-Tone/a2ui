@@ -21,8 +21,8 @@ from a2a.server.request_handlers import DefaultRequestHandler
 from a2a.server.tasks import InMemoryTaskStore
 from a2a.types import AgentCapabilities, AgentCard, AgentSkill
 from a2ui.a2ui_extension import get_a2ui_agent_extension
-from agent import JiraAgent
-from agent_executor import JiraAgentExecutor
+from agent import SalesforceAgent
+from agent_executor import SalesforceAgentExecutor
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
@@ -39,10 +39,9 @@ class MissingAPIKeyError(Exception):
 
 @click.command()
 @click.option("--host", default="localhost")
-@click.option("--port", default=10004)
+@click.option("--port", default=10003)
 def main(host, port):
     try:
-        # Check for API key only if Vertex AI is not configured
         if not os.getenv("GOOGLE_GENAI_USE_VERTEXAI") == "TRUE":
             if not os.getenv("GEMINI_API_KEY"):
                 raise MissingAPIKeyError(
@@ -54,27 +53,27 @@ def main(host, port):
             extensions=[get_a2ui_agent_extension()],
         )
         skill = AgentSkill(
-            id="manage_jira",
-            name="Jira Management Tool",
-            description="Helps find and manage Jira issues (e.g., search by project, assign issues).",
-            tags=["jira", "issue", "ticket", "task"],
-            examples=["Show me open tickets in PROJ", "Assign PROJ-123 to me"],
+            id="manage_salesforce",
+            name="Salesforce Management Tool",
+            description="Helps find and manage Salesforce records (Leads, Opportunities, Accounts, etc.).",
+            tags=["salesforce", "crm", "lead", "opportunity", "account"],
+            examples=["Show me my open leads", "Find account Acme"],
         )
 
         base_url = f"http://{host}:{port}"
 
         agent_card = AgentCard(
-            name="Jira Agent",
-            description="This agent helps you manage your Jira issues.",
+            name="Salesforce Agent",
+            description="This agent helps you manage your Salesforce data.",
             url=base_url,
             version="1.0.0",
-            default_input_modes=JiraAgent.SUPPORTED_CONTENT_TYPES,
-            default_output_modes=JiraAgent.SUPPORTED_CONTENT_TYPES,
+            default_input_modes=SalesforceAgent.SUPPORTED_CONTENT_TYPES,
+            default_output_modes=SalesforceAgent.SUPPORTED_CONTENT_TYPES,
             capabilities=capabilities,
             skills=[skill],
         )
 
-        agent_executor = JiraAgentExecutor(base_url=base_url)
+        agent_executor = SalesforceAgentExecutor(base_url=base_url)
 
         request_handler = DefaultRequestHandler(
             agent_executor=agent_executor,
@@ -95,7 +94,7 @@ def main(host, port):
             allow_headers=["*"],
         )
 
-        app.mount("/static", StaticFiles(directory="images"), name="static")
+        # app.mount("/static", StaticFiles(directory="images"), name="static") # No images yet
 
         uvicorn.run(app, host=host, port=port)
     except MissingAPIKeyError as e:

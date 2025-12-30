@@ -80,6 +80,17 @@ connector_tool = ApplicationIntegrationToolset(
 #     # if project:
 #     #     results = [i for i in results if i["project"].upper() == project.upper()]
 #     if query:
-#         results = [i for i in results if query.lower() in i["key"].lower()]
+#         q = query.lower()
+#         def match(text):
+#             t = str(text).lower()
+#             return q in t or t in q
+
+#         results = [
+#             i for i in results 
+#             if match(i["key"]) or 
+#                match(i["summary"]) or 
+#                match(i["priority"]) or
+#                match(i["status"])
+#         ]
         
 #     return results

@@ -9,6 +9,7 @@ resolution-markers = [
 [manifest]
 members = [
     "a2ui-adk-jira",
+    "a2ui-adk-salesforce",
     "a2ui-contact-lookup",
     "a2ui-restaurant-finder",
     "orchestrator",
@@ -47,6 +48,33 @@ requires-dist = [{ name = "a2a-sdk", specifier = ">=0.3.0" }]
 name = "a2ui-adk-jira"
 version = "0.1.0"
 source = { editable = "adk_jira" }
+dependencies = [
+    { name = "a2a-sdk" },
+    { name = "a2ui" },
+    { name = "click" },
+    { name = "google-adk" },
+    { name = "google-genai" },
+    { name = "jsonschema" },
+    { name = "litellm" },
+    { name = "python-dotenv" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "a2a-sdk", specifier = ">=0.3.0" },
+    { name = "a2ui", directory = "../../../a2a_agents/python/a2ui_extension" },
+    { name = "click", specifier = ">=8.1.8" },
+    { name = "google-adk", git = "https://github.com/google/adk-python.git?rev=143ad44" },
+    { name = "google-genai", specifier = ">=1.27.0" },
+    { name = "jsonschema", specifier = ">=4.0.0" },
+    { name = "litellm" },
+    { name = "python-dotenv", specifier = ">=1.1.0" },
+]
+
+[[package]]
+name = "a2ui-adk-salesforce"
+version = "0.1.0"
+source = { editable = "adk_salesforce" }
 dependencies = [
     { name = "a2a-sdk" },
     { name = "a2ui" },

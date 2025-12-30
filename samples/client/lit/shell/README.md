@@ -22,7 +22,7 @@ This sample depends on the Lit renderer. Before running this sample, you need to
    cd - # back to the sample directory
    npm install
    ```
-
+1
 3. **Run the servers:**
    - Run the [A2A server](../../../agent/adk/restaurant_finder/)
    - Run the dev server: `npm run dev`

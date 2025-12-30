@@ -476,8 +476,9 @@ JIRA_UI_EXAMPLES = r"""
           "component": {
             "Row": {
               "children": {
-                "explicitList": ["item_key", "item_summary"]
-              }
+                "explicitList": ["item_key", "item_summary", "view_btn"]
+              },
+              "distribution": "spaceBetween"
             }
           }
         },
@@ -498,6 +499,22 @@ JIRA_UI_EXAMPLES = r"""
               "usageHint": "body"
             }
           }
+        },
+        {
+          "id": "view_btn",
+          "component": {
+            "Button": {
+              "child": "view_text",
+              "action": {
+                "name": "view_issue",
+                "context": [{ "key": "issue_key", "value": { "path": "key" } }]
+              }
+            }
+          }
+        },
+        {
+          "id": "view_text",
+          "component": { "Text": { "text": { "literalString": "View" } } }
         }
       ]
     }
@@ -732,6 +749,112 @@ JIRA_UI_EXAMPLES = r"""
               "usageHint": "h5"
             }
           }
+        }
+      ]
+    }
+  }
+--- EDIT_ISSUE_FORM_EXAMPLE ---
+[
+  {
+    "surfaceId": "edit_issue_modal",
+    "beginRendering": {
+      "root": "edit_issue_root",
+      "surfaceId": "edit_issue_modal",
+      "styles": {
+        "primaryColor": "#0052CC"
+      }
+    }
+  },
+  {
+    "surfaceId": "edit_issue_modal",
+    "dataModelUpdate": {
+      "surfaceId": "edit_issue_modal",
+      "contents": [
+        { "key": "key", "valueString": "PROJ-123" },
+        { "key": "summary", "valueString": "Update documentation for A2UI" },
+        { "key": "description", "valueString": "The documentation needs to be updated to reflect the new API changes." },
+        { "key": "status", "valueString": "In Progress" }
+      ]
+    }
+  },
+  {
+    "surfaceId": "edit_issue_modal",
+    "surfaceUpdate": {
+      "surfaceId": "edit_issue_modal",
+      "components": [
+        {
+          "id": "edit_issue_root",
+          "component": {
+            "Card": {
+              "child": "form_col"
+            }
+          }
+        },
+        {
+          "id": "form_col",
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": ["form_title", "summary_input", "desc_input", "status_input", "save_btn"]
+              }
+            }
+          }
+        },
+        {
+          "id": "form_title",
+          "component": { "Text": { "text": { "literalString": "Edit Issue" }, "usageHint": "h3" } }
+        },
+        {
+          "id": "summary_input",
+          "component": {
+            "TextField": {
+              "label": { "literalString": "Summary" },
+              "text": { "path": "/summary" },
+              "textFieldType": "shortText"
+            }
+          }
+        },
+        {
+          "id": "desc_input",
+          "component": {
+            "TextField": {
+              "label": { "literalString": "Description" },
+              "text": { "path": "/description" },
+              "textFieldType": "longText"
+            }
+          }
+        },
+        {
+          "id": "status_input",
+          "component": {
+            "TextField": {
+              "label": { "literalString": "Status" },
+              "text": { "path": "/status" },
+              "textFieldType": "shortText"
+            }
+          }
+        },
+        {
+          "id": "save_btn",
+          "component": {
+            "Button": {
+              "child": "save_text",
+              "primary": true,
+              "action": {
+                "name": "save_issue_changes",
+                "context": [
+                  { "key": "key", "value": { "path": "/key" } },
+                  { "key": "summary", "value": { "path": "/summary" } },
+                  { "key": "description", "value": { "path": "/description" } },
+                  { "key": "status", "value": { "path": "/status" } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "save_text",
+          "component": { "Text": { "text": { "literalString": "Save Changes" } } }
         }
       ]
     }
