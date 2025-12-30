@@ -40,16 +40,26 @@ from a2a.client.client import ClientConfig as A2AClientConfig
 from a2a.client.client_factory import ClientFactory as A2AClientFactory
 from a2ui.a2ui_extension import A2UI_CLIENT_CAPABILITIES_KEY
 
+
+
+from a2a.types import (
+    
+    AgentCard
+)
+
+from a2a.client import Client
+from a2a.client.middleware import ClientCallContext 
+
 class A2UIMetadataInterceptor(ClientCallInterceptor):
     @override
     async def intercept(
         self,
         method_name: str,
-        request_payload: dict[str, Any],
-        http_kwargs: dict[str, Any],
+        request_payload: dict[str, any],
+        http_kwargs: dict[str, any],
         agent_card: AgentCard | None,
         context: ClientCallContext | None,
-    ) -> tuple[dict[str, Any], dict[str, Any]]:
+    ) -> tuple[dict[str, any], dict[str, any]]:
         """Enables the A2UI extension header and adds A2UI client capabilities to remote agent message metadata."""
         logger.info("Intercepting client call to method: " + method_name + " and payload " + json.dumps(request_payload))
                 
