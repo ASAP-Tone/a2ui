@@ -92,21 +92,87 @@ export class A2UIClient {
       },
     });
 
+    console.log("A2A Raw Response:", response);
+
     if ("error" in response) {
+      console.error("A2A Error Response:", response.error);
       throw new Error(response.error.message);
     }
 
-    const result = (response as SendMessageSuccessResponse).result as Task;
-    if (result.kind === "task" && result.status.message?.parts) {
+    let task = (response as SendMessageSuccessResponse).result as Task;
+    console.log("Initial Task:", task);
+
+    // Polling for completion
+    let attempts = 0;
+    while (task.kind === 'task' && (task.status?.state === 'working' || !task.status?.message) && attempts < 30) {
+        console.log(`Task state: ${task.status?.state}, Message present: ${!!task.status?.message}. Polling... (${attempts + 1})`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        try {
+            const updateResponse = await client.getTask({ id: task.id });
+            if ('error' in updateResponse) {
+                 console.warn("Error polling task:", updateResponse.error);
+                 break;
+            }
+            task = updateResponse.result as Task;
+        } catch (e) {
+            console.error("Polling exception:", e);
+            break;
+        }
+        attempts++;
+    }
+    
+    console.log("Final Task State:", task);
+
+    let messageParts = task.status?.message?.parts;
+    
+    // Fallback 1: Check events history
+    if (!messageParts && (task as any).events && (task as any).events.length > 0) {
+        const events = (task as any).events;
+        for (let i = events.length - 1; i >= 0; i--) {
+            if (events[i].status?.message?.parts) {
+                console.log("Found message parts in task history events!");
+                messageParts = events[i].status.message.parts;
+                break;
+            }
+        }
+    }
+
+    // Fallback 2: Check artifacts (common in ADK orchestrator responses)
+    if (!messageParts && (task as any).artifacts && (task as any).artifacts.length > 0) {
+         console.log("Found artifacts in task, checking for parts...");
+         const artifacts = (task as any).artifacts;
+         // Artifacts usually contain parts directly or nested
+         for (const artifact of artifacts) {
+             if (artifact.parts && artifact.parts.length > 0) {
+                 console.log("Found parts in artifact:", artifact.artifactId);
+                 // We accumulate parts or just take the first valid one? 
+                 // Usually artifacts represent the 'response' content.
+                 // We will append them to a list if we are building a message.
+                 // But here we need 'messageParts' structure.
+                 // Let's assume the artifact parts ARE the message parts we need.
+                 if (!messageParts) messageParts = [];
+                 messageParts.push(...artifact.parts);
+             }
+         }
+    }
+
+    if (task.kind === "task" && messageParts) {
       const messages: v0_8.Types.ServerToClientMessage[] = [];
-      for (const part of result.status.message.parts) {
+      console.log(`Processing ${messageParts.length} parts...`);
+      
+      for (const part of messageParts) {
+        console.log("Processing part:", part);
         if (part.kind === 'data') {
+          console.log("Found data part, adding to A2UI messages:", part.data);
           messages.push(part.data as v0_8.Types.ServerToClientMessage);
+        } else {
+          console.log(`Skipping part of kind: ${part.kind}`);
         }
       }
       return messages;
     }
 
+    console.warn("A2A Response (after polling) did not contain a valid task with message parts.");
     return [];
   }
 }

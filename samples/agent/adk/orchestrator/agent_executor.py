@@ -77,6 +77,7 @@ class OrchestratorAgentExecutor(A2aAgentExecutor):
         context_id: Optional[str] = None,
         part_converter: part_converter.GenAIPartToA2APartConverter = part_converter.convert_genai_part_to_a2a_part,
     ) -> List[A2AEvent]:
+        logger.info(f"Processing event from author: {event.author}")
         a2a_events = event_converter.convert_event_to_a2a_events(
             event,
             invocation_context,
@@ -84,8 +85,14 @@ class OrchestratorAgentExecutor(A2aAgentExecutor):
             context_id,
             part_converter,
         )
+        logger.info(f"Converted to {len(a2a_events)} A2A events")
 
         for a2a_event in a2a_events:
+            if a2a_event.status and a2a_event.status.message:
+                 logger.info(f"A2A Event Message Parts Count: {len(a2a_event.status.message.parts)}")
+            else:
+                 logger.warning("A2A Event has no message in status!")
+
             # Try to populate subagent agent card if available.
             subagent_card = None
             if (active_subagent_name := event.author):
@@ -93,6 +100,7 @@ class OrchestratorAgentExecutor(A2aAgentExecutor):
                 if (subagent := next((sub for sub in invocation_context.agent.sub_agents if sub.name == active_subagent_name), None)):
                     try:
                         subagent_card = json.loads(subagent.description)
+                        logger.info(f"Found subagent card for {active_subagent_name}")
                     except Exception:
                         logger.warning(f"Failed to parse agent description for {active_subagent_name}")
             if subagent_card:
@@ -101,20 +109,19 @@ class OrchestratorAgentExecutor(A2aAgentExecutor):
                 a2a_event.metadata["a2a_subagent"] = subagent_card
                         
             for a2a_part in a2a_event.status.message.parts:
-                if (
-                    is_a2ui_part(a2a_part)
-                    and (begin_rendering := a2a_part.root.data.get("beginRendering"))
-                    and (surface_id := begin_rendering.get("surfaceId"))
-                ):                    
-                    asyncio.run_coroutine_threadsafe(
-                        SubagentRouteManager.set_route_to_subagent_name(
-                            surface_id,
-                            event.author,
-                            invocation_context.session_service,
-                            invocation_context.session,
-                        ),
-                        asyncio.get_event_loop(),
-                    )
+                if is_a2ui_part(a2a_part):
+                    logger.info("Detected A2UI part in A2A event")
+                    if (begin_rendering := a2a_part.root.data.get("beginRendering")) and (surface_id := begin_rendering.get("surfaceId")):
+                        logger.info(f"Found beginRendering for surfaceId: {surface_id}")                    
+                        asyncio.run_coroutine_threadsafe(
+                            SubagentRouteManager.set_route_to_subagent_name(
+                                surface_id,
+                                event.author,
+                                invocation_context.session_service,
+                                invocation_context.session,
+                            ),
+                            asyncio.get_event_loop(),
+                        )
 
         return a2a_events
 
@@ -143,6 +150,7 @@ class OrchestratorAgentExecutor(A2aAgentExecutor):
         session = await super()._prepare_session(context, run_request, runner)
         
         if try_activate_a2ui_extension(context):
+            logger.info("A2UI extension activated for session")
             client_capabilities = context.message.metadata.get(A2UI_CLIENT_CAPABILITIES_KEY) if context.message and context.message.metadata else None
             
             await runner.session_service.append_event(
@@ -159,5 +167,7 @@ class OrchestratorAgentExecutor(A2aAgentExecutor):
                         ),
                     ),
                 )
+        else:
+            logger.info("A2UI extension NOT activated")
             
         return session

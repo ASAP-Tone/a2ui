@@ -660,6 +660,10 @@ export class A2UILayoutEditor extends SignalWatcher(LitElement) {
           Jira Assistant
           <div class="badge-pulse"></div>
         </a>
+        <a class="nav-item">
+          <span class="g-icon">cloud</span>
+          Salesforce Agent
+        </a>
       </div>
 
       <div class="sidebar-footer">
@@ -879,20 +883,31 @@ export class A2UILayoutEditor extends SignalWatcher(LitElement) {
   }
 
   async #sendAndProcessMessage(request) {
+    console.log("Sending message to agent:", request);
     const messages = await this.#sendMessage(request);
-    console.log("Received messages:", messages);
+    console.log("A2UI Messages received from Client:", messages);
+    
     this.#lastMessages = messages;
+    console.log("Clearing existing surfaces...");
     this.#processor.clearSurfaces();
+    
+    console.log("Processing new A2UI messages...");
     this.#processor.processMessages(messages);
-    this.requestUpdate(); // Force update just in case
+    
+    const updatedSurfaces = this.#processor.getSurfaces();
+    console.log(`Processor updated. Total surfaces now: ${updatedSurfaces.size}`);
+    
+    this.requestUpdate(); 
   }
 
   #maybeRenderData() {
     const surfaces = this.#processor.getSurfaces();
-    console.log("Rendering surfaces, count:", surfaces.size);
     if (surfaces.size === 0) {
+      console.log("No surfaces to render (surfaces.size === 0)");
       return nothing;
     }
+
+    console.log(`Rendering ${surfaces.size} surfaces:`, Array.from(surfaces.keys()));
 
     // Wrap the surfaces in a "message bubble" look for the Agent
     return html`
