@@ -68,153 +68,110 @@ JIRA_UI_EXAMPLES = r"""
           "id": "issue_root",
           "component": {
             "Card": {
-              "child": "issue_content_col"
+              "child": "main_col"
             }
           }
         },
         {
-          "id": "issue_content_col",
+          "id": "main_col",
           "component": {
             "Column": {
               "children": {
-                "explicitList": ["issue_header", "issue_summary", "issue_description", "issue_meta", "actions_row", "comments_section"]
+                "explicitList": ["header_row", "title_text", "divider1", "metadata_grid", "divider2", "comments_title", "comments_list", "add_comment_section"]
               },
-              "distribution": "start",
               "alignment": "stretch"
             }
           }
         },
         {
-          "id": "issue_header",
+          "id": "header_row",
           "component": {
             "Row": {
-              "children": {
-                "explicitList": ["issue_key", "issue_status"]
-              },
-              "distribution": "spaceBetween"
+              "children": { "explicitList": ["issue_key", "issue_status"] },
+              "distribution": "spaceBetween",
+              "alignment": "center"
             }
           }
         },
         {
           "id": "issue_key",
-          "component": {
-            "Text": {
-              "text": { "path": "/key" },
-              "usageHint": "h3"
-            }
-          }
+          "component": { "Text": { "text": { "path": "/key" }, "usageHint": "h5" } }
         },
         {
           "id": "issue_status",
-          "component": {
-            "Text": {
-              "text": { "path": "/status" },
-              "usageHint": "caption"
-            }
-          }
+          "component": { "Text": { "text": { "path": "/status" }, "usageHint": "caption" } }
         },
         {
-          "id": "issue_summary",
-          "component": {
-            "Text": {
-              "text": { "path": "/summary" },
-              "usageHint": "h5"
-            }
-          }
+          "id": "title_text",
+          "component": { "Text": { "text": { "path": "/summary" }, "usageHint": "h4" } }
         },
         {
-          "id": "issue_description",
-          "component": {
-            "Text": {
-              "text": { "path": "/description" },
-              "usageHint": "body"
-            }
-          }
+          "id": "divider1",
+          "component": { "Divider": { "axis": "horizontal" } }
         },
         {
-          "id": "issue_meta",
+          "id": "metadata_grid",
           "component": {
             "Row": {
-              "children": {
-                "explicitList": ["priority_label", "priority_val", "assignee_label", "assignee_val"]
-              },
+              "children": { "explicitList": ["priority_col", "assignee_col"] },
               "distribution": "start"
             }
           }
         },
         {
-          "id": "priority_label",
-          "component": { "Text": { "text": { "literalString": "Priority: " }, "usageHint": "caption" } }
+          "id": "priority_col",
+          "weight": 1,
+          "component": {
+            "Column": {
+              "children": { "explicitList": ["prio_label", "prio_val"] }
+            }
+          }
         },
         {
-          "id": "priority_val",
+          "id": "prio_label",
+          "component": { "Text": { "text": { "literalString": "Priority" }, "usageHint": "caption" } }
+        },
+        {
+          "id": "prio_val",
           "component": { "Text": { "text": { "path": "/priority" }, "usageHint": "body" } }
         },
         {
-          "id": "assignee_label",
-          "component": { "Text": { "text": { "literalString": " | Assignee: " }, "usageHint": "caption" } }
+          "id": "assignee_col",
+          "weight": 1,
+          "component": {
+            "Column": {
+              "children": { "explicitList": ["assign_label", "assign_val_row"] }
+            }
+          }
         },
         {
-          "id": "assignee_val",
+          "id": "assign_label",
+          "component": { "Text": { "text": { "literalString": "Assignee" }, "usageHint": "caption" } }
+        },
+        {
+          "id": "assign_val_row",
+          "component": {
+            "Row": {
+              "children": { "explicitList": ["avatar_icon", "assignee_name"] },
+              "alignment": "center"
+            }
+          }
+        },
+        {
+          "id": "avatar_icon",
+          "component": { "Icon": { "name": { "literalString": "accountCircle" } } }
+        },
+        {
+          "id": "assignee_name",
           "component": { "Text": { "text": { "path": "/assignee" }, "usageHint": "body" } }
         },
         {
-          "id": "actions_row",
-          "component": {
-            "Row": {
-              "children": {
-                "explicitList": ["edit_btn", "assign_me_btn"]
-              },
-              "distribution": "end"
-            }
-          }
+          "id": "divider2",
+          "component": { "Divider": { "axis": "horizontal" } }
         },
         {
-          "id": "edit_btn",
-          "component": {
-            "Button": {
-              "child": "edit_text",
-              "action": {
-                "name": "edit_issue",
-                "context": [{ "key": "key", "value": { "path": "/key" } }]
-              }
-            }
-          }
-        },
-        {
-          "id": "edit_text",
-          "component": { "Text": { "text": { "literalString": "Edit" } } }
-        },
-        {
-          "id": "assign_me_btn",
-          "component": {
-            "Button": {
-              "child": "assign_me_text",
-              "primary": true,
-              "action": {
-                "name": "assign_issue_to_me",
-                "context": [{ "key": "key", "value": { "path": "/key" } }]
-              }
-            }
-          }
-        },
-        {
-          "id": "assign_me_text",
-          "component": { "Text": { "text": { "literalString": "Assign to Me" } } }
-        },
-        {
-          "id": "comments_section",
-          "component": {
-            "Column": {
-              "children": {
-                "explicitList": ["comments_header", "comments_list", "add_comment_row"]
-              }
-            }
-          }
-        },
-        {
-          "id": "comments_header",
-          "component": { "Text": { "text": { "literalString": "Comments" }, "usageHint": "h5" } }
+          "id": "comments_title",
+          "component": { "Text": { "text": { "literalString": "Activity" }, "usageHint": "h5" } }
         },
         {
           "id": "comments_list",
@@ -242,9 +199,7 @@ JIRA_UI_EXAMPLES = r"""
           "id": "comment_content",
           "component": {
             "Column": {
-              "children": {
-                "explicitList": ["comment_author", "comment_body"]
-              }
+              "children": { "explicitList": ["comment_author", "comment_body"] }
             }
           }
         },
@@ -257,22 +212,29 @@ JIRA_UI_EXAMPLES = r"""
           "component": { "Text": { "text": { "path": "body" }, "usageHint": "body" } }
         },
         {
-          "id": "add_comment_row",
+          "id": "add_comment_section",
           "component": {
-            "Row": {
-              "children": {
-                "explicitList": ["new_comment_input", "post_comment_btn"]
-              }
+            "Column": {
+              "children": { "explicitList": ["add_comment_input", "post_btn_row"] }
             }
           }
         },
         {
-          "id": "new_comment_input",
+          "id": "add_comment_input",
           "component": {
             "TextField": {
-              "label": { "literalString": "Add a comment..." },
+              "label": { "literalString": "Write a comment..." },
               "text": { "path": "/new_comment" },
               "textFieldType": "shortText"
+            }
+          }
+        },
+        {
+          "id": "post_btn_row",
+          "component": {
+            "Row": {
+              "children": { "explicitList": ["post_comment_btn"] },
+              "distribution": "end"
             }
           }
         },
@@ -504,7 +466,7 @@ JIRA_UI_EXAMPLES = r"""
           "id": "view_btn",
           "component": {
             "Button": {
-              "child": "view_text",
+              "child": "view_icon",
               "action": {
                 "name": "view_issue",
                 "context": [{ "key": "issue_key", "value": { "path": "key" } }]
@@ -513,8 +475,8 @@ JIRA_UI_EXAMPLES = r"""
           }
         },
         {
-          "id": "view_text",
-          "component": { "Text": { "text": { "literalString": "View" } } }
+          "id": "view_icon",
+          "component": { "Icon": { "name": { "literalString": "visibility" } } }
         }
       ]
     }

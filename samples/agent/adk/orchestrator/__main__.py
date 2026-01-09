@@ -38,7 +38,15 @@ class MissingAPIKeyError(Exception):
 @click.command()
 @click.option("--host", default="localhost", type=str)
 @click.option("--port", default=10002, type=int)
-@click.option("--subagent_urls", multiple=True, type=str, required=True)
+@click.option(
+    "--subagent_urls",
+    multiple=True,
+    type=str,
+    default=[
+        "https://adk-jira-service-39067166180.us-central1.run.app",
+        "https://adk-salesforce-service-39067166180.us-central1.run.app",
+    ],
+)
 def main(host, port, subagent_urls):
     try:
         # Check for API key only if Vertex AI is not configured
@@ -66,7 +74,7 @@ def main(host, port, subagent_urls):
 
         app.add_middleware(
             CORSMiddleware,
-            allow_origins=["http://localhost:5173"],
+            allow_origin_regex="https?://(localhost|127\\.0\\.0\\.1)(:\\d+)?",
             allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],

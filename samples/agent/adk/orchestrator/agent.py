@@ -50,6 +50,14 @@ from a2a.types import (
 from a2a.client import Client
 from a2a.client.middleware import ClientCallContext 
 
+# from phoenix.otel import register
+# tracer_provider = register(
+    
+#     project_name="default",
+#     endpoint= "http://0.0.0.0:6006/v1/traces",# "https://app.phoenix.arize.com/s/tonyruiz",
+#     auto_instrument=True
+# )
+
 class A2UIMetadataInterceptor(ClientCallInterceptor):
     @override
     async def intercept(

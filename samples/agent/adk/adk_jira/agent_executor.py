@@ -37,7 +37,7 @@ from a2ui.a2ui_extension import create_a2ui_part, try_activate_a2ui_extension
 
 logger = logging.getLogger(__name__)
 
-
+import time 
 class JiraAgentExecutor(AgentExecutor):
     """Jira AgentExecutor Example."""
 
@@ -60,7 +60,9 @@ class JiraAgentExecutor(AgentExecutor):
             agent = self.ui_agent
         else:
             agent = self.text_agent
-
+        logging.info("starting time ")
+        start_time = time.time()
+        logger.info(f"executing....")
         if context.message and context.message.parts:
             for part in context.message.parts:
                 if isinstance(part.root, DataPart):
@@ -134,7 +136,9 @@ class JiraAgentExecutor(AgentExecutor):
 
             if not final_parts or all(isinstance(p.root, TextPart) and not p.root.text for p in final_parts):
                  final_parts = [Part(root=TextPart(text="OK."))]
-
+            end_time = time.time() - start_time
+            logger.info ("ending time ")
+            logger.info( end_time )
             await updater.update_status(
                 final_state,
                 new_agent_parts_message(final_parts, task.context_id, task.id),

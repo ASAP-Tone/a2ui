@@ -104,7 +104,7 @@ export class A2UIClient {
 
     // Polling for completion
     let attempts = 0;
-    while (task.kind === 'task' && (task.status?.state === 'working' || !task.status?.message) && attempts < 30) {
+    while (task.kind === 'task' && (task.status?.state === 'working' || !task.status?.message) && attempts < 3) {
         console.log(`Task state: ${task.status?.state}, Message present: ${!!task.status?.message}. Polling... (${attempts + 1})`);
         await new Promise(resolve => setTimeout(resolve, 1000));
         try {

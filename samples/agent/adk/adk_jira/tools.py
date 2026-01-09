@@ -13,13 +13,14 @@
 # limitations under the License.
 
 import logging
+import os
 from typing import Any
 
 logger = logging.getLogger(__name__)
 from google.adk.tools.application_integration_tool.application_integration_toolset import ApplicationIntegrationToolset
 
 connector_tool = ApplicationIntegrationToolset(
-    project="truiz-agent-builder", # TODO: replace with GCP project of the connection
+    project=os.environ.get("GOOGLE_CLOUD_PROJECT"), # Dynamically get project ID
     location="us-central1", #TODO: replace with location of the connection
     connection="jira-conn", #TODO: replace with connection name
     entity_operations={"Issues": ["LIST","CREATE", "GET", "UPDATE"], 
