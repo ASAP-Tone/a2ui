@@ -2022,6 +2022,7 @@ dependencies = [
     { name = "jsonschema" },
     { name = "litellm" },
     { name = "python-dotenv" },
+    { name = "uvicorn" },
 ]
 
 [package.metadata]
@@ -2034,6 +2035,7 @@ requires-dist = [
     { name = "jsonschema", specifier = ">=4.0.0" },
     { name = "litellm" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
+    { name = "uvicorn" },
 ]
 
 [[package]]

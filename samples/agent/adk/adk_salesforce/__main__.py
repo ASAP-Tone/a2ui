@@ -60,7 +60,11 @@ def main(host, port):
             examples=["Show me my open leads", "Find account Acme"],
         )
 
-        base_url = f"http://{host}:{port}"
+        env_agent_url = os.getenv("AGENT_URL")
+        if env_agent_url:
+            base_url = env_agent_url
+        else:
+            base_url = f"http://{host}:{port}"
 
         agent_card = AgentCard(
             name="Salesforce Agent",
@@ -88,7 +92,7 @@ def main(host, port):
 
         app.add_middleware(
             CORSMiddleware,
-            allow_origin_regex=r"http://localhost:\d+",
+            allow_origin_regex=".*",
             allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],

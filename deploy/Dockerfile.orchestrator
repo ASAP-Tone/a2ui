@@ -1,0 +1,11 @@
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+WORKDIR /app
+COPY samples/agent/adk/pyproject.toml samples/agent/adk/uv.lock /app/samples/agent/adk/
+COPY samples/agent/adk/orchestrator /app/samples/agent/adk/orchestrator
+COPY a2a_agents/python/a2ui_extension /app/a2a_agents/python/a2ui_extension
+WORKDIR /app/samples/agent/adk
+RUN apt-get update && apt-get install -y git
+RUN uv sync --package orchestrator
+WORKDIR /app/samples/agent/adk/orchestrator
+ENV PORT=8080
+CMD ["uv", "run", "__main__.py", "--host", "0.0.0.0", "--port", "8080"]

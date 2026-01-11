@@ -42,10 +42,7 @@ class MissingAPIKeyError(Exception):
     "--subagent_urls",
     multiple=True,
     type=str,
-    default=[
-        "https://adk-jira-service-39067166180.us-central1.run.app",
-        "https://adk-salesforce-service-39067166180.us-central1.run.app",
-    ],
+    default=None,
 )
 def main(host, port, subagent_urls):
     try:
@@ -56,7 +53,22 @@ def main(host, port, subagent_urls):
                     "GEMINI_API_KEY environment variable not set and GOOGLE_GENAI_USE_VERTEXAI is not TRUE."
                 )
 
-        base_url = f"http://{host}:{port}"
+        if not subagent_urls:
+            env_urls = os.getenv("SUBAGENT_URLS")
+            if env_urls:
+                subagent_urls = [url.strip() for url in env_urls.split(",")]
+            else:
+                subagent_urls = [
+                    "https://adk-jira-service-39067166180.us-central1.run.app",
+                    "https://adk-salesforce-service-39067166180.us-central1.run.app",
+                ]
+
+        
+        env_agent_url = os.getenv("AGENT_URL")
+        if env_agent_url:
+            base_url = env_agent_url
+        else:
+            base_url = f"http://{host}:{port}"
         
         orchestrator_agent = asyncio.run(OrchestratorAgent.build_agent(subagent_urls=subagent_urls))
         agent_executor = OrchestratorAgentExecutor(base_url=base_url, agent=orchestrator_agent)
@@ -74,12 +86,13 @@ def main(host, port, subagent_urls):
 
         app.add_middleware(
             CORSMiddleware,
-            allow_origin_regex="https?://(localhost|127\\.0\\.0\\.1)(:\\d+)?",
+            allow_origin_regex=".*",
             allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],
         )
 
+        logger.info("Starting server with permissive CORS (regex='.*')...")
         uvicorn.run(app, host=host, port=port)
     except MissingAPIKeyError as e:
         logger.error(f"Error: {e} {traceback.format_exc()}")

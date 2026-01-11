@@ -35,9 +35,8 @@ export class A2UIClient {
 
   async #getClient() {
     if (!this.#client) {
-      // Default to localhost:10002 if no URL provided (fallback for restaurant app default)
-      // const baseUrl = this.#serverUrl || "http://localhost:10002";
-      const baseUrl = this.#serverUrl || "http://localhost:10002";
+      // Default to Cloud Run orchestrator if no URL provided
+      const baseUrl = this.#serverUrl || "https://adk-orchestrator-service-39067166180.us-central1.run.app";
       this.#client = await A2AClient.fromCardUrl(
         `${baseUrl}/.well-known/agent-card.json`,
         {

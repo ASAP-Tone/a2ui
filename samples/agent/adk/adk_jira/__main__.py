@@ -61,7 +61,11 @@ def main(host, port):
             examples=["Show me open tickets in PROJ", "Assign PROJ-123 to me"],
         )
 
-        base_url = f"http://{host}:{port}"
+        env_agent_url = os.getenv("AGENT_URL")
+        if env_agent_url:
+            base_url = env_agent_url
+        else:
+            base_url = f"http://{host}:{port}"
 
         agent_card = AgentCard(
             name="Jira Agent",
@@ -89,7 +93,7 @@ def main(host, port):
 
         app.add_middleware(
             CORSMiddleware,
-            allow_origin_regex=r"http://localhost:\d+",
+            allow_origin_regex=".*",
             allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],

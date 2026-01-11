@@ -45,10 +45,12 @@ import "./ui/ui.js";
 // Configurations
 import { AppConfig } from "./configs/types.js";
 import { config as jiraConfig } from "./configs/jira.js";
+import { config as orchestratorConfig } from "./configs/orchestrator.js";
 import { styleMap } from "lit/directives/style-map.js";
 
 const configs: Record<string, AppConfig> = {
   jira: jiraConfig,
+  orchestrator: orchestratorConfig,
 };
 
 @customElement("a2ui-shell")
@@ -66,7 +68,7 @@ export class A2UILayoutEditor extends SignalWatcher(LitElement) {
   accessor #lastMessages: v0_8.Types.ServerToClientMessage[] = [];
 
   @state()
-  accessor config: AppConfig = configs.jira;
+  accessor config: AppConfig = configs.orchestrator;
 
   @state()
   accessor #loadingTextIndex = 0;
@@ -521,8 +523,8 @@ export class A2UILayoutEditor extends SignalWatcher(LitElement) {
     super.connectedCallback();
 
     const urlParams = new URLSearchParams(window.location.search);
-    const appKey = urlParams.get("app") || "jira";
-    this.config = configs[appKey] || configs.jira;
+    const appKey = urlParams.get("app") || "orchestrator";
+    this.config = configs[appKey] || configs.orchestrator;
 
     if (this.config.theme) {
       this.theme = this.config.theme;
@@ -621,29 +623,44 @@ export class A2UILayoutEditor extends SignalWatcher(LitElement) {
     `;
   }
 
+  navigateToAgent(agentKey: string) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("app", agentKey);
+    window.location.href = url.toString();
+  }
+
   renderSidebar() {
     if (this.sidebarCollapsed) {
-       return html`
-         <div class="sidebar-header" style="justify-content: center; padding: 16px 0;">
-             <span class="g-icon">chat_bubble</span>
-         </div>
-       `;
+      return html`
+        <div
+          class="sidebar-header"
+          style="justify-content: center; padding: 16px 0;"
+        >
+          <span class="g-icon">chat_bubble</span>
+        </div>
+      `;
     }
 
     return html`
       <div class="sidebar-header">
-         <div style="font-weight: 600; font-size: 18px; display: flex; align-items: center; gap: 8px;">
-           <span class="g-icon" style="color: var(--primary)">smart_toy</span> A2UI Agent
-         </div>
+        <div
+          style="font-weight: 600; font-size: 18px; display: flex; align-items: center; gap: 8px;"
+        >
+          <span class="g-icon" style="color: var(--primary)">smart_toy</span>
+          A2UI Agent
+        </div>
       </div>
 
-      <button class="new-chat-btn" @click=${() => {
-          this.currentView = 'home';
+      <button
+        class="new-chat-btn"
+        @click=${() => {
+          this.currentView = "home";
           this.#chatHistory = [];
           this.#processor.clearSurfaces();
           this.#lastMessages = [];
           this.requestUpdate();
-      }}>
+        }}
+      >
         <span class="g-icon">add</span> New Chat
       </button>
 
@@ -651,15 +668,30 @@ export class A2UILayoutEditor extends SignalWatcher(LitElement) {
         <div class="section-title">Recent Chats</div>
         <a class="nav-item active">
           <span class="g-icon">chat</span>
-          Project JIRA Update
+          ${this.config.key === "orchestrator"
+            ? "Jira & Salesforce"
+            : "Project JIRA Update"}
         </a>
-        
+
         <div class="section-title">Agents</div>
-        <a class="nav-item active">
-          <span class="g-icon">bug_report</span>
-          Jira Assistant
-          <div class="badge-pulse"></div>
-        </a>
+        ${Object.entries(configs).map(
+          ([key, agentConfig]) => html`
+            <a
+              class="nav-item ${this.config.key === key ? "active" : ""}"
+              @click=${() => this.navigateToAgent(key)}
+            >
+              <span class="g-icon"
+                >${agentConfig.key === "orchestrator"
+                  ? "hub"
+                  : "bug_report"}</span
+              >
+              ${agentConfig.title}
+              ${this.config.key === key
+                ? html`<div class="badge-pulse"></div>`
+                : ""}
+            </a>
+          `
+        )}
         <a class="nav-item">
           <span class="g-icon">cloud</span>
           Salesforce Agent
@@ -668,14 +700,12 @@ export class A2UILayoutEditor extends SignalWatcher(LitElement) {
 
       <div class="sidebar-footer">
         <a class="nav-item theme-toggle-btn" @click=${this.toggleTheme}>
-           <span class="g-icon">dark_mode</span> Theme
+          <span class="g-icon">dark_mode</span> Theme
         </a>
         <a class="nav-item">
-           <span class="g-icon">settings</span> Settings
+          <span class="g-icon">settings</span> Settings
         </a>
-        <a class="nav-item">
-           <span class="g-icon">account_circle</span> Tony
-        </a>
+        <a class="nav-item"> <span class="g-icon">account_circle</span> Tony </a>
       </div>
     `;
   }
